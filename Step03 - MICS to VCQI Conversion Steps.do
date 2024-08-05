@@ -7,7 +7,6 @@ Date Created:    			2016-04-28
 Author:         Mary Kay Trimner
 Stata version:    14.0
 ********************************************************************************/
-*******************************************************************************
 * Change log
 * 				Updated
 *				version
@@ -96,7 +95,7 @@ foreach d in MONTH DAY YEAR {
 	
 	
 	foreach v in `=subinstr("`vlist`d''",","," ",.)' { //replace "," with space " " for purposes of doing replacement
-			replace `v'=. if inlist(`v',99,98,9999,9998) 
+			replace `v'=. if inlist(`v',99,98,9999,9998,97,9997) // These are invalid dob values
 	}
 
 	di "`vlist`d''"
@@ -231,7 +230,7 @@ save, replace
 			}
 			else if missing(vallab) {
 				use "${OUTPUT_FOLDER}/MICS_${MICS_NUM}_combined_dataset", clear
-				gen HH04=HH03
+				tostring HH03, gen(HH04) //gen HH04=HH03
 				save, replace
 			}
 	}
@@ -249,7 +248,7 @@ label value HH03
 capture tostring HH04, replace
 ****************************************************************
 * Create variable for HH14 household number
-clonevar HH14=$HH_ID
+tostring $HH_ID, gen(HH14) //clonevar HH14=$HH_ID
 
 ****************************************************************
 * Create VCQI Variable HH12
@@ -390,7 +389,7 @@ clonevar HM01=HH01
 clonevar HM02=HH02
 clonevar HM03=HH03
 clonevar HM04=HH04
-clonevar HM09=${HH_ID}
+tostring $HH_ID, gen(HM09) //clonevar HM09=${HH_ID}
 clonevar HM22=${HM_LINE}
 
 * Create variables for HM27(sex), HM29(age years) and HM30(age months) 
@@ -729,7 +728,7 @@ if $RI_SURVEY==1 {
 			
 			if "${CHILD_DOB_`i'_`c'}"!="" {
 				replace dob_date_`v'_`d'=${CHILD_DOB_`i'_`c'} 
-				replace dob_date_`v'_`d'=. if inlist(dob_date_`v'_`d',44,4444,66,6666)
+				replace dob_date_`v'_`d'=. if inlist(dob_date_`v'_`d',44,4444,66,6666,97,9997,98,9998,99,9999)
 			}
 		}
 	}
@@ -768,7 +767,9 @@ if $RI_SURVEY==1 {
 			
 			* Create tick marks for each dose 
 			gen `d'_tick_`v'=.
-			replace `d'_tick_`v'=1 if inlist(`d'_date_`v'_m,44,4444) | inlist(`d'_date_`v'_d,44,4444) | inlist(`d'_date_`v'_y,44,4444)
+			replace `d'_tick_`v'=1 if inlist(`d'_date_`v'_m,44,4444,97,9997) | ///
+										inlist(`d'_date_`v'_d,44,4444,97,9997) | ///
+										inlist(`d'_date_`v'_y,44,4444,97,9997) // Replacing tick as 44 indicates tick on form and 97 value indicates inconsistent
 			
 			label variable `d'_tick_`v' "`d' tick mark on `v'"
 
@@ -850,8 +851,7 @@ if $RI_SURVEY==1 {
 		
 		* Replace all other values with missing
 		replace `=lower("`d'")'_history=. if !inlist(`=lower("`d'")'_history,1,2,99)  //Anything not 1 (Yes) or 2 (No) DNK (99) set to missing 
-		
-		
+
 	}
 
 	* Create variable for bcg_scar_history if bcg is part of RI_LIST
@@ -875,12 +875,16 @@ if $RI_SURVEY==1 {
 		local s card register
 	}
 
+
 	foreach g in `s' {
 		di "`s'"
 		foreach v in `=lower("${RI_LIST}")' {
-			foreach m in m d y {
-				replace `v'_date_`g'_`m'=. if inlist(`v'_date_`g'_`m',0,44,4444,66,6666)
-			}
+			replace `v'_date_`g'_y = . if `v'_date_`g'_y > 9000
+			replace `v'_date_`g'_y = . if inlist(`v'_date_`g'_y,0,44,4444,66,6666)
+			replace `v'_date_`g'_m = . if `v'_date_`g'_m > 12
+			replace `v'_date_`g'_m = . if inlist(`v'_date_`g'_m,0)
+			replace `v'_date_`g'_d = . if `v'_date_`g'_d > 31
+			replace `v'_date_`g'_d = . if inlist(`v'_date_`g'_d,0)
 		}
 	}
 * Now for MICS6 if they dose list and hepb0 & penta1 we want to check to see if the dates were the same or if hepb0 occured after penta1.

@@ -12,6 +12,14 @@ Author:         Mary Kay Trimner
 
 Stata version:    14.0
 **********************************************************************/
+
+* Change log
+* 				Updated
+*				version
+* Date 			number 	Name			What Changed
+* 2019-02-06	1.02	MK Trimner		Made the names proper case
+* 2019-07-24	1.03	MK Trimner		Removed extra level2name so decode works
+*******************************************************************************
 * Bring in Combined dataset
 use "${OUTPUT_FOLDER}/MICS_${MICS_NUM}_combined_dataset", clear
 
@@ -23,6 +31,7 @@ clear
 set obs 1
 generate level1id = 1 in 1
 generate level1name = "${LEVEL1_NAME}" in 1
+replace level1name = proper(level1name)
 save level1name, replace
 
 * Create level2names dataset

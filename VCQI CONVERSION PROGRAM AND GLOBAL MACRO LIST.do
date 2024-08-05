@@ -298,6 +298,7 @@ global BCG_SCAR
 global OPV0_HIST					IM17
 
 * OPV
+
 global OPV_DOSE_NUM					IM18
 global OPV_HIST						IM16
 
@@ -308,15 +309,15 @@ global IPV_DOSE_NUM 				1
 global IPV_HIST						IM19
 
 * DPT or PENTA doses 1-3
-global PENTA_DOSE_NUM				IM21
+global PENTA_DOSE_NUM			IM21
 global PENTA_HIST					IM20
 
 * PCV doses 1-3
-global PCV_DOSE_NUM					IM23
+global PCV_DOSE_NUM				IM23
 global PCV_HIST						IM22
 
 * Measles or MMR or MR
-global MEAS_DOSE_NUM				IM26A
+global MEAS_DOSE_NUM			IM26A
 global MEAS_HIST					IM26
 
 * Hepb at birth
@@ -329,7 +330,6 @@ global YF_HIST						IM27
 * Vitamin A doses 1-2
 global VITA_DOSE_NUM				1
 global VITA_HIST					IM27B
-
 
 * Meningitis A
 global MENA_DOSE_NUM				1
