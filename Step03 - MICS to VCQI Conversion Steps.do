@@ -27,6 +27,10 @@ Stata version:    14.0
 * 		MK Trimner							Made HH04 a string variable
 * 2022-03-29	1.04	MK Trimner			For CARD SEEN replaced 8 (dnk) with a 9 that is actually in the datasets.
 * 2023-03-05	1.05	MK Trimner			changed history for first dose to be set to 1 regardless of the number of doses if said yes received.
+* 2023-06-15	1.06	MK Trimner			Changed OPV history count to exclude those with a value of 8 & 9
+*											Corrected code for RI27 to set to 1 instead of 1 or 0 in MICS6
+* 2024-08-02	1.07	MK Trimner			Corrected typo in code for RI27
+
 
 use "${OUTPUT_FOLDER}/MICS_${MICS_NUM}_combined_dataset", clear
 
@@ -629,7 +633,7 @@ if $RI_SURVEY==1 {
 
 			label var RI26 "Card or Other document ever received"
 			
-			gen RI27 = inlist($CARD_SEEN,1,2,3) if RI26 == 1
+			gen RI27 = 1 if inlist($CARD_SEEN,1,2,3) & RI26 == 1
 			replace RI27 = 2 if $CARD_SEEN == 4 & RI26 == 1
 			replace RI27 = 2 if missing(RI27) & RI26 == 1
 			label var RI27 "Card or other document seen"
@@ -828,7 +832,7 @@ if $RI_SURVEY==1 {
 			if "`=lower("`d'")'" == "opv0" {
 				local g opv
 				gen num_opv = ${OPV_DOSE_NUM} 
-				replace num_opv = num_opv -1 if ${OPV0_HIST}==1  & ${`=upper("`g'")'_DOSE_NUM} != 8
+				replace num_opv = num_opv -1 if ${OPV0_HIST}==1  & ${`=upper("`g'")'_DOSE_NUM} < 8 // This has a value of 9 that we want to exclude
 				
 				global `=upper("`g'")'_DOSE_NUM num_`g'
 			}

@@ -21,6 +21,7 @@ Stata version:    14.0
 *-------------------------------------------------------------------------------
 * 2023-02-26	1.01	MK Trimner 		Added check to see if more than 1 weight per cluster.
 *										If yes, create dataset with 1 weight per respondent in survey type.
+* 2023-06-12	1.02	MK Trimner		Added HH02 HH4 and province_id to be kept in empty dataset
 ********************************************************************************
 
 * Bring in Combined dataset
@@ -95,7 +96,7 @@ if `maxvalue' > 1 {
 	
 	* Create an empty CM datasets
 	* Urban/Rural cluster can be missing; if there is a populated value for this cluster, use it
-	keep HH01 HH03 urban_cluster psweight* 
+	keep HH01 HH02 HH03 HH04 urban_cluster psweight* province_id	
 	sort HH01 HH03 urban_cluster
 	bysort HH01 HH03: replace urban_cluster = urban_cluster[1]
 
